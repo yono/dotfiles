@@ -1,0 +1,8 @@
+coreutils
+git
+peco
+tig
+vim
+zsh
+zsh-completions
+zsh-syntax-highlighting
