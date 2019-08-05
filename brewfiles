@@ -1,6 +1,6 @@
 coreutils
+fzf
 git
-peco
 tig
 vim
 zsh

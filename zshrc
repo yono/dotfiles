@@ -226,8 +226,4 @@ autoload -U zmv
 autoload -U compinit && compinit && compinit -i
 
 # ghq
-alias repos='ghq list | peco'
-alias g='cd $(ghq root)/$(repos)'
-alias b='g; hub browse'
-alias a='atom $(ghq root)/$(repos)'
-alias v='code $(ghq root)/$(repos)'
+alias g='cd $(ghq root)/$(ghq list | fzf)'
