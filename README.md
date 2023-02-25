@@ -1,5 +1,9 @@
 # dotfiles
 
+## Dependencies
+
+* Homebrew
+
 ## Suportted software
 
 * zsh
