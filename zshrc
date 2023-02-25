@@ -3,6 +3,8 @@
 # UTF-8
 #
 
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 #文字コードの設定
 export LANG=ja_JP.UTF-8
 export LC_ALL=ja_JP.UTF-8
@@ -108,21 +110,11 @@ autoload -Uz add-zsh-hook
 autoload -Uz colors ; colors
 autoload -Uz vcs_info
 
-# vcs 設定
-function _update_vcs_info_msg() {
-  psvar=()
-  LANG=en_US.UTF-8 vcs_info
-  [[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
-}
-
-PROMPT="${USER}@%m%  ${CYAN}[%~]${DEFAULT}
-$ "
-
 # ssh で remotehost を補完
 function print_known_hosts (){
-    if [ -f $HOME/.ssh/known_hosts ]; then
-        cat $HOME/.ssh/known_hosts | tr ',' ' ' | cut -d' ' -f1
-    fi
+  if [ -f $HOME/.ssh/known_hosts ]; then
+    cat $HOME/.ssh/known_hosts | tr ',' ' ' | cut -d' ' -f1
+  fi
 }
 _cache_hosts=($( print_known_hosts ))
 
@@ -158,6 +150,11 @@ PATH=$HOME/bin:$PATH
 PATH=$HOME/bin/fast-export:$PATH
 PATH=$HOME/Dropbox/bin:$PATH
 PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+PATH=/opt/homebrew/bin:$PATH
+PATH="$HOME/.nodenv/bin:$PATH"
+
+source $(brew --prefix yvm)/yvm.sh
+eval "$(nodenv init -)"
 
 export MANPATH=/usr/local/man:/usr/share/man
 export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
@@ -177,7 +174,7 @@ zstyle ':complition:*:sudo:*' command-path /opt/local/bin/ /usr/local/sbin /usr/
 # rbenv 利用設定
 if [ -e $HOME/.rbenv ]; then
   export PATH="$HOME/.rbenv/bin:$PATH"
-  eval "$(rbenv init -)"
+  eval "$(rbenv init - zsh)"
 fi
 
 # Extra zshrc
@@ -192,38 +189,60 @@ if [ -e /usr/local/bin/src-hilite-lesspipe.sh ]; then
 fi
 
 function peco-select-history() {
-    local tac
-    if which tac > /dev/null; then
-        tac="tac"
-    else
-        tac="tail -r"
-    fi
-    BUFFER=$(\history -n 1 | \
-        eval $tac | \
-        peco --query "$LBUFFER")
-    CURSOR=$#BUFFER
-    zle clear-screen
+  local tac
+  if which tac > /dev/null; then
+    tac="tac"
+  else
+    tac="tail -r"
+  fi
+  BUFFER=$(\history -n 1 | \
+    eval $tac | \
+    peco --query "$LBUFFER")
+  CURSOR=$#BUFFER
+  zle clear-screen
 }
 zle -N peco-select-history
 bindkey '^r' peco-select-history
 
 if [ -x "`which go`" ]; then
-      export GOROOT=`go env GOROOT`
-      export GOPATH=$HOME/code/go-local
-      export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+  export GOROOT=`go env GOROOT`
+  export GOPATH=$HOME/code/go-local
+  export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 fi
 
-fpath=(/usr/local/share/zsh/site-functions $fpath)
+# brew install zsh-autosuggestions
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # brew install zsh-completions
-fpath=(/usr/local/share/zsh-completions $fpath)
+FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+
+# brew install zsh-git-prompt
+source $(brew --prefix)/opt/zsh-git-prompt/zshrc.sh
 
 # brew install zsh-syntax-highlighting
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+autoload -Uz compinit && compinit
 
 #autoload
 autoload -U zmv
 autoload -U compinit && compinit && compinit -i
+
+# refs: https://zenn.dev/sprout2000/articles/bd1fac2f3f83bc
+git_prompt() {
+  if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = true ]; then
+    PROMPT="${USER}@%m% ${CYAN}[%~] $(git_super_status)${DEFAULT}
+$ "
+  else
+    PROMPT="${USER}@%m% ${CYAN}[%~] ${DEFAULT}
+$ "
+  fi
+}
+
+precmd() {
+  git_prompt
+}
+alias python="python3"
 
 # ghq
 alias g='cd $(ghq root)/$(ghq list | fzf)'
