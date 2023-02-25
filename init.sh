@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if !(type "brew" > /dev/null 2>&1); then
+  echo "Homebrewをインストールしてください"
+  exit
+fi
+
 DOTFILES="${HOME}/.dotfiles"
 
 for rcfile in zshrc vimrc hyper.js
