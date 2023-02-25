@@ -17,7 +17,7 @@ brew tap homebrew/cask-fonts
 
 for package in `cat brewcaskfiles`
 do
-  brew cask install ${package}
+  brew install ${package} --cask
 done
 
 # vim
