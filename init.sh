@@ -1,8 +1,13 @@
 #!/bin/sh
 
+if !(type "brew" > /dev/null 2>&1); then
+  echo "Homebrewをインストールしてください"
+  exit
+fi
+
 DOTFILES="${HOME}/.dotfiles"
 
-for rcfile in zshrc vimrc hyper.js
+for rcfile in zshrc vimrc
 do
   ln -sf ${DOTFILES}/${rcfile} ${HOME}/.${rcfile}
 done
@@ -17,7 +22,7 @@ brew tap homebrew/cask-fonts
 
 for package in `cat brewcaskfiles`
 do
-  brew cask install ${package}
+  brew install ${package} --cask
 done
 
 # vim

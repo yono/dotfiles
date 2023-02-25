@@ -1,8 +1,11 @@
 coreutils
 fzf
 git
+peco
 tig
 vim
 zsh
+zsh-autosuggestions
 zsh-completions
+zsh-git-prompt
 zsh-syntax-highlighting
