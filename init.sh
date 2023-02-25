@@ -7,7 +7,7 @@ fi
 
 DOTFILES="${HOME}/.dotfiles"
 
-for rcfile in zshrc vimrc hyper.js
+for rcfile in zshrc vimrc
 do
   ln -sf ${DOTFILES}/${rcfile} ${HOME}/.${rcfile}
 done
